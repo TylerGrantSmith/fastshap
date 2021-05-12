@@ -272,12 +272,14 @@ explain.default <- function(object, feature_names = NULL, X = NULL, nsim = 1,
     
     # Compute average training prediction (fnull) and predictions associated
     # with each explanation (fx)
-    if (is.null(newdata)) {  # explain all training rows
-      fnull <- mean(fx <- pred_wrapper(object, newdata = X))
-    } else {  # explain new observation(s)
+    if (is.null(newdata) && is.null(fnull)) {  # explain all training rows
+      fx <- pred_wrapper(object, newdata = X)
+    } else { # explain new observation(s)
       fx <- pred_wrapper(object, newdata = newdata)
-      fnull <- mean(pred_wrapper(object, newdata = X))
-    }
+    } 
+    
+    if (is.null(fnull)) 
+      fnull <- mean(fx)
     
     # Adjust sum of approximate Shapley values
     if (length(dim(res)) == 3L) {  # multiple explanations
