@@ -194,6 +194,7 @@ explain <- function(object, ...) {
 #' @export
 explain.default <- function(object, feature_names = NULL, X = NULL, nsim = 1, 
                             pred_wrapper = NULL, newdata = NULL, adjust = FALSE,
+                            fnull = NULL,
                             ...) {
   
   # Experimental patch for more efficiently computing single-row explanations
@@ -208,7 +209,10 @@ explain.default <- function(object, feature_names = NULL, X = NULL, nsim = 1,
         # Compute average training prediction (fnull) and predictions associated
         # with each explanation (fx)
         fx <- pred_wrapper(object, newdata = newdata[1L, , drop = FALSE])
-        fnull <- mean(pred_wrapper(object, newdata = X))
+        
+        if (is.null(fnull))
+          fnull <- mean(pred_wrapper(object, newdata = X))
+        
         phi_var <- apply(res, MARGIN = 2, FUN = stats::var)
         err <- fx - sum(phi_avg) - fnull
         v <- (phi_var / max(phi_var)) * 1e6
